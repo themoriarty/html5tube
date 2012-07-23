@@ -3,13 +3,20 @@ function getSrc(o){
 	return o.src;
     if (o.data)
 	return o.data;
+    var params = o.getElementsByTagName("param");
+    for (var i = 0; i < params.length; ++i){
+	if (params[i].name == "movie"){
+	    return params[i].value;
+	}
+    }
     return "";
 };
 
 function getSource(e){
     var src = getSrc(e);
-    if (src.search("http://www.youtube.com/v/") == 0 || src.search("http://youtube.com/v/") == 0)
+    if (src.search(/https?:\/\/(www\.)?youtube\.com\/(v|embed)\//) == 0){	
 	return "youtube";
+    }
     if (src.search("http://www.kino-govno.com/") == 0)
 	return "kino-govno";
     if (src.search("http://video.ted.com/") == 0)
@@ -21,7 +28,7 @@ function getSource(e){
 
 function srcVideo(source, e){
     switch (source){
-    case "youtube": return getSrc(e).replace(/youtube.com\/v\/([^\?&]+)([^\"\']*)/, "youtube.com/embed/$1");
+    case "youtube": return getSrc(e).replace(/youtube.com\/(v|embed)\/([^\?&]+)([^\"\']*)/, "youtube.com/embed/$2");
     case "kino-govno": return getQueryVariable(e.getAttribute("flashvars"), "file");
     case "ted.com": return getQueryVariable(e.getAttribute("flashvars"), "vu");
     case "vimeo": return "//vimeo.com/play_redirect?clip_id=" + getQueryVariable(getSrc(e), "clip_id") + "&codecs=H264";
@@ -96,5 +103,15 @@ function doReplace(embeds){
 		}
 	    }
     }};
-doReplace(document.getElementsByTagName("embed"));
-doReplace(document.getElementsByTagName("object"));
+
+function doReplaceAll(e){
+    //doReplace([e]);
+    if (e.getElementsByTagName){
+	doReplace(e.getElementsByTagName("embed"));
+	doReplace(e.getElementsByTagName("object"));
+    };
+};
+document.addEventListener('DOMNodeInserted', function(e){
+    doReplaceAll(e.target);
+});
+doReplaceAll(document);
