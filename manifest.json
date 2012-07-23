@@ -1,0 +1,16 @@
+{
+  "name": "Html5Tube",
+  "version": "0.2.0",
+  "description": "Automatically replaces embedded *tube flash player with html5 player",
+  "icons": { "16": "images/h5tube_16.png",
+             "48": "images/h5tube_48.png",
+             "128": "images/h5tube.png" },
+  "content_scripts": [
+     {
+      "matches": ["http://*/*"],
+      "js": ["replacer.js"],
+      "run_at": "document_end",
+      "all_frames": true
+     }
+  ]
+}
